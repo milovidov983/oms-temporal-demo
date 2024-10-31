@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Каталог</title>
+</head>
+<body>
+    <header>
+        <h1>Корзина</h1>
+    </header>
+    <main>
+        <div class="product-card">
+            <img src="kafka.png" alt="Продукт" class="product-image">
+            <div class="product-info">
+                <h2 class="product-title">Кашка</h2>
+                <p class="product-description">Просто гречневая кашка</p>
+                <p class="product-price">Цена: 5 руб.</p>
+                <button class="add-to-cart-btn" onclick="makeOrder(this)">Оплатить</button>
+                <div id="update-button-container"></div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Кусь 😻 магазин</p>
+    </footer>
+
+    <script>
+        function makeOrder(button) {
+            // Изменяем текст на кнопке
+            button.textContent = "Заказ оплачен";
+            button.disabled = true;
+
+            const updateButtonContainer = document.getElementById("update-button-container");
+            if (!updateButtonContainer.querySelector('.update-btn')) {
+                
+                const updateButton = document.createElement("button");
+                updateButton.textContent = "Обновить";
+                updateButton.className = "update-btn";
+                updateButton.onclick = function() {
+                    refreshData(button);
+                };
+                
+                updateButtonContainer.appendChild(updateButton);
+            }
+        }
+        async function refreshData(button) {
+            try {
+                const response = await fetch('http://localhost:8080/status');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                const data = await response.json();
+                button.textContent = data.text;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
