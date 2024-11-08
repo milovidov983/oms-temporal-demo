@@ -26,37 +26,6 @@
         <p>&copy; 2024 Кусь 😻 магазин</p>
     </footer>
 
-    <script>
-        function makeOrder(button) {
-            // Изменяем текст на кнопке
-            button.textContent = "Заказ оплачен";
-            button.disabled = true;
-
-            const updateButtonContainer = document.getElementById("update-button-container");
-            if (!updateButtonContainer.querySelector('.update-btn')) {
-                
-                const updateButton = document.createElement("button");
-                updateButton.textContent = "Обновить";
-                updateButton.className = "update-btn";
-                updateButton.onclick = function() {
-                    refreshData(button);
-                };
-                
-                updateButtonContainer.appendChild(updateButton);
-            }
-        }
-        async function refreshData(button) {
-            try {
-                const response = await fetch('http://localhost:8080/status');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                const data = await response.json();
-                button.textContent = data.text;
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

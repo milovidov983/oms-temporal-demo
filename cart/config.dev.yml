@@ -1,0 +1,11 @@
+# Cart service dev config
+
+server:
+  host: localhost
+  port: 9999
+
+external:
+  services:
+    oms-core:
+      host: localhost
+      port: 8888

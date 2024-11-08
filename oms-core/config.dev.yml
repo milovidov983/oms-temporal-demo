@@ -1,0 +1,9 @@
+database:
+  connectionString: postgres://devuser:devpassword@localhost:5432/devdb?sslmode=disable
+
+kafka:
+  brokers: localhost:9092
+  topic: oms.oms-core.orders.v1
+
+server:
+  address: 8888
