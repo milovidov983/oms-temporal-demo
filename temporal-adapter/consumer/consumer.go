@@ -22,8 +22,7 @@ type KafkaConsumer struct {
 }
 
 type EventHandler interface {
-	HandleOrderCreated(event events.OrderEvent) error
-	HandleOrderCancelled(event events.OrderEvent) error
+	HandleOrderEvent(event events.OrderEvent)
 }
 
 type ConsumerConfig struct {
@@ -60,7 +59,7 @@ func (c *KafkaConsumer) Start(ctx context.Context) error {
 		defer wg.Done()
 		for {
 			if err := c.consumer.Consume(ctx, topics, c); err != nil {
-				c.logger.Printf("Error from consumer: %v", err)
+				c.logger.Printf("[error] Error from consumer: %v", err)
 			}
 			if ctx.Err() != nil {
 				return
@@ -73,9 +72,9 @@ func (c *KafkaConsumer) Start(ctx context.Context) error {
 	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
 	select {
 	case <-ctx.Done():
-		c.logger.Println("Terminating: context cancelled")
+		c.logger.Println("[info] Terminating: context cancelled")
 	case <-sigterm:
-		c.logger.Println("Terminating: via signal")
+		c.logger.Println("[info] Terminating: via signal")
 	}
 
 	cancel := func() {}
@@ -84,7 +83,7 @@ func (c *KafkaConsumer) Start(ctx context.Context) error {
 
 	wg.Wait()
 	if err := c.consumer.Close(); err != nil {
-		c.logger.Printf("Error closing consumer: %v", err)
+		c.logger.Printf("[error] Error closing consumer: %v", err)
 		return err
 	}
 
@@ -106,25 +105,11 @@ func (c *KafkaConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 	for message := range claim.Messages() {
 		var event events.OrderEvent
 		if err := json.Unmarshal(message.Value, &event); err != nil {
-			c.logger.Printf("Error unmarshaling message: %v", err)
+			c.logger.Printf("[error] Error unmarshaling message: %v", err)
 			continue
 		}
 
-		var err error
-		switch event.EventType {
-		case events.OrderCreated:
-			err = c.handler.HandleOrderCreated(event)
-		case events.OrderCancelled:
-			err = c.handler.HandleOrderCancelled(event)
-		default:
-			c.logger.Printf("Unknown event type: %s", event.EventType)
-			continue
-		}
-
-		if err != nil {
-			c.logger.Printf("Error handling event: %v", err)
-			continue
-		}
+		c.handler.HandleOrderEvent(event)
 
 		session.MarkMessage(message, "")
 	}
