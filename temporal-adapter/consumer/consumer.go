@@ -32,6 +32,21 @@ type ConsumerConfig struct {
 	Handler EventHandler
 }
 
+func (cfg *ConsumerConfig) Check() {
+	if len(cfg.Brokers) == 0 {
+		log.Fatal("[fatal] Kafka Consumer Brokers are not set")
+	}
+	if cfg.GroupID == "" {
+		log.Fatal("[fatal] Kafka Consumer GroupID is not set")
+	}
+	if cfg.Topic == "" {
+		log.Fatal("[fatal] Kafka Consumer Topic is not set")
+	}
+	if cfg.Handler == nil {
+		log.Fatal("[fatal] Kafka Consumer Handler is not set")
+	}
+}
+
 func NewKafkaConsumer(cfg ConsumerConfig) (*KafkaConsumer, error) {
 	config := sarama.NewConfig()
 	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategySticky()

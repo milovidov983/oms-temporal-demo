@@ -15,14 +15,25 @@ func main() {
 
 	loadConfig()
 
-	cfg := consumer.ConsumerConfig{
-		Brokers: []string{viper.GetString("kafka.brokers")},
-		GroupID: viper.GetString(),
-		Topic:   "oms.oms-core.orders.v1",
-		Handler: handler.NewOrderHandler(),
+	handlerConfig := handler.OrderHandlerConfig{
+		TemporalHost: viper.GetString("temporal.hostPort"),
+		Namespace:    viper.GetString("temporal.oms"),
 	}
+	handlerConfig.Check()
 
-	consumer, err := consumer.NewKafkaConsumer(cfg)
+	orderHandler, err := handler.NewOrderHandler(handlerConfig)
+	if err != nil {
+		log.Fatalf("[fatal] Error creating order handler: %v", err)
+	}
+	cosumerConfig := consumer.ConsumerConfig{
+		Brokers: []string{viper.GetString("kafka.brokers")},
+		GroupID: viper.GetString("kafka.consumerGroup"),
+		Topic:   "oms.oms-core.orders.v1",
+		Handler: orderHandler,
+	}
+	cosumerConfig.Check()
+
+	consumer, err := consumer.NewKafkaConsumer(cosumerConfig)
 	if err != nil {
 		log.Fatalf("Error creating consumer: %v", err)
 	}

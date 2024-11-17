@@ -13,15 +13,40 @@ type OrderHandlerConfig struct {
 	Namespace    string
 }
 
+func (cfg *OrderHandlerConfig) Check() {
+	if cfg.TemporalHost == "" {
+		log.Fatal("[fatal] Temporal host is not set")
+	}
+	if cfg.Namespace == "" {
+		log.Fatal("[fatal] Temporal Namespace is not set")
+	}
+}
+
 type OrderHandler struct {
 	logger   *log.Logger
 	temporal client.Client
 }
 
-func NewOrderHandler() *OrderHandler {
-	return &OrderHandler{
-		logger: log.New(os.Stdout, "[order-handler]", log.LstdFlags),
+func newTemporalClient(options client.Options) (client.Client, error) {
+	if options.HostPort == "" {
+		options.HostPort = os.Getenv("TEMPORAL_GRPC_ENDPOINT")
 	}
+
+	return client.NewLazyClient(options)
+}
+
+func NewOrderHandler(cfg OrderHandlerConfig) (*OrderHandler, error) {
+	client, err := newTemporalClient(client.Options{
+		HostPort:  cfg.TemporalHost,
+		Namespace: cfg.Namespace,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &OrderHandler{
+		logger:   log.New(os.Stdout, "[order-handler]", log.LstdFlags),
+		temporal: client,
+	}, nil
 }
 
 func (h *OrderHandler) HandleOrderEvent(event events.OrderEvent) {
