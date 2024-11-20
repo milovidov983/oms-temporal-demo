@@ -43,6 +43,6 @@ services:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       - kafka

@@ -1,5 +1,5 @@
 database:
-  connectionString: postgres://devuser:devpassword@localhost:5432/devdb?sslmode=disable
+  connectionString: postgres://devuser:devpassword@localhost:15432/devdb?sslmode=disable
 
 kafka:
   brokers: localhost:9092

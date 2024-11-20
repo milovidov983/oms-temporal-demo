@@ -7,6 +7,7 @@ import (
 	"go.temporal.io/sdk/worker"
 
 	"github.com/milovidov983/oms-temporal-demo/workers/activities"
+	"github.com/milovidov983/oms-temporal-demo/workers/queue"
 	"github.com/milovidov983/oms-temporal-demo/workers/temporal"
 	"github.com/milovidov983/oms-temporal-demo/workers/workflows"
 	"github.com/spf13/viper"
@@ -17,20 +18,30 @@ func main() {
 
 	loadConfig()
 
-	c, err := temporal.NewClient()
+	temporalConfig := temporal.TemporalClientConfig{
+		HostPort:  viper.GetString("temporal.hostPort"),
+		Namespace: viper.GetString("temporal.namespace"),
+	}
+	temporalConfig.Check()
+	c, err := temporal.NewClient(temporalConfig)
 
 	if err != nil {
 		log.Fatalln("Unable to create client", err)
 	}
 	defer c.Close()
 
-	w := worker.New(c, "order-processing-main", worker.Options{})
+	activitiesConfig := &activities.ActivitiesConfig{
+		OmsCoreHostPort: viper.GetString("services.omsCore.hostPort"),
+	}
+	activitiesConfig.Check()
+
+	a := activities.NewActivities(activitiesConfig)
+
+	w := worker.New(c, queue.TaskQueueNameOrder, worker.Options{})
 
 	w.RegisterWorkflow(workflows.ProcessOrder)
 
-	w.RegisterActivity(&activities.Activities{
-		OmsCoreHost: "localhost:8889",
-	})
+	w.RegisterActivity(a)
 
 	err = w.Run(worker.InterruptCh())
 	if err != nil {

@@ -1,12 +1,9 @@
 temporal:
   hostPort: localhost:7233
-  namespace: oms
+  namespace: oms-dev
 
 kafka:
   brokers: localhost:9092
   consumerGroup: oms-temporal-adapter
   topics:
     orders: oms.oms-core.orders.v1
-
-server:
-  address: 8899

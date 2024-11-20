@@ -7,8 +7,6 @@ import (
 	"go.temporal.io/sdk/log"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
-
-	"github.com/milovidov983/oms-temporal-demo/workers/signals/channels"
 )
 
 const (
@@ -81,12 +79,12 @@ func ProcessOrder(ctx workflow.Context, input *OrderProcessingWorkflowInput) err
 	}
 
 	// Channels
-	startAssemblyChannel := workflow.GetSignalChannel(ctx, channels.SignalNameStartAssemblyChannel)
-	completeAssemblyChannel := workflow.GetSignalChannel(ctx, channels.SignalNameCompleteAssemblyChannel)
-	changeAssemblyCommentChannel := workflow.GetSignalChannel(ctx, channels.SignalNameChangeAssemblyCommentChannel)
-	completeDeliveryChannel := workflow.GetSignalChannel(ctx, channels.SignalNameCompleteDeliveryChannel)
-	changeDeliveryCommentChannel := workflow.GetSignalChannel(ctx, channels.SignalNameChangeDeliveryCommentChannel)
-	cancelOrderChannel := workflow.GetSignalChannel(ctx, channels.SignalNameCancelOrderChannel)
+	// startAssemblyChannel := workflow.GetSignalChannel(ctx, channels.SignalNameStartAssemblyChannel)
+	// completeAssemblyChannel := workflow.GetSignalChannel(ctx, channels.SignalNameCompleteAssemblyChannel)
+	// changeAssemblyCommentChannel := workflow.GetSignalChannel(ctx, channels.SignalNameChangeAssemblyCommentChannel)
+	// completeDeliveryChannel := workflow.GetSignalChannel(ctx, channels.SignalNameCompleteDeliveryChannel)
+	// changeDeliveryCommentChannel := workflow.GetSignalChannel(ctx, channels.SignalNameChangeDeliveryCommentChannel)
+	// cancelOrderChannel := workflow.GetSignalChannel(ctx, channels.SignalNameCancelOrderChannel)
 
 	// Идем в OMS Core и понимаем какой тип заказа перед нами, какие у него свойства и состав
 	// и прочие значимые для принятия решения характеристики

@@ -5,5 +5,5 @@
 Install goose, then use below command:
 
 ```bash
-goose -dir migrations postgres "postgres://devuser:devpassword@localhost:5432/devdb?sslmode=disable" up
+goose -dir migrations postgres "postgres://devuser:devpassword@localhost:15432/devdb?sslmode=disable" up
 ```

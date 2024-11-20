@@ -17,7 +17,7 @@ func main() {
 
 	handlerConfig := handler.OrderHandlerConfig{
 		TemporalHost: viper.GetString("temporal.hostPort"),
-		Namespace:    viper.GetString("temporal.oms"),
+		Namespace:    viper.GetString("temporal.namespace"),
 	}
 	handlerConfig.Check()
 
@@ -28,7 +28,7 @@ func main() {
 	cosumerConfig := consumer.ConsumerConfig{
 		Brokers: []string{viper.GetString("kafka.brokers")},
 		GroupID: viper.GetString("kafka.consumerGroup"),
-		Topic:   "oms.oms-core.orders.v1",
+		Topic:   viper.GetString("kafka.topics.orders"),
 		Handler: orderHandler,
 	}
 	cosumerConfig.Check()
