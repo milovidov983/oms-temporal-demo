@@ -15,10 +15,9 @@ type OrderRepository struct {
 	db *sql.DB
 }
 
-func NewOrderRepository(connStr string) (*OrderRepository, error) {
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+func NewOrderRepository(db *sql.DB) (*OrderRepository, error) {
+	if db == nil {
+		return nil, fmt.Errorf("%w: database connection is required", ErrInvalidInput)
 	}
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
@@ -107,6 +106,7 @@ func (r *OrderRepository) UpdateOrderStatus(ctx context.Context, orderID string,
         WHERE id = $2
     `
 	_, err := r.db.ExecContext(ctx, query, status, orderID)
+
 	return err
 }
 

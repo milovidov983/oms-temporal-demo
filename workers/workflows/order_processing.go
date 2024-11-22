@@ -95,6 +95,15 @@ func ProcessOrder(ctx workflow.Context, input *OrderProcessingWorkflowInput) err
 	// Если заказ требует оплаты то делаем необходимые действия и завершаем заказ
 	// и т.д.
 
+	IsNeedAssembly := true
+
+	if IsNeedAssembly {
+		// start assembly
+		// wait for assembly completion
+		// complete assembly
+		// change assembly comment
+	}
+
 	w.OrderProcessingState.State = "processing_completed"
 	w.pushStatus(ctx, w.OrderProcessingState.State)
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -17,12 +18,10 @@ func main() {
 	loadConfig()
 
 	dbConnectionString := viper.GetString("database.connectionString")
-	repo, err := repository.NewOrderRepository(dbConnectionString)
+	db, err := sql.Open("postgres", dbConnectionString)
 	if err != nil {
-		log.Fatalf("[fatal] Error creating order repository: %v", err)
+		log.Fatalf("failed to connect to database: %w", err)
 	}
-	log.Printf("[info] Order repository created")
-
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
 	brokerAddresses := viper.GetStringSlice("kafka.brokers")
@@ -33,14 +32,34 @@ func main() {
 	}
 	defer producer.Close()
 
-	orderTopic := viper.GetString("kafka.topic")
-	orderService := service.NewOrderService(repo, producer, orderTopic)
+	// Order
+	orderRepo, err := repository.NewOrderRepository(db)
+	if err != nil {
+		log.Fatalf("[fatal] Error creating order repository: %v", err)
+	}
+	log.Printf("[info] Order repository created")
+	orderTopic := viper.GetString("kafka.topics.order")
+	orderService := service.NewOrderService(orderRepo, producer, orderTopic)
 
 	log.Printf("[info] Order service created with topic: %s", orderTopic)
 
 	orderHandler := handler.NewOrderHandler(orderService)
 	http.HandleFunc("/api/orders", orderHandler.CreateOrder)
 	http.HandleFunc("/api/orders/status", orderHandler.GetStatus)
+
+	// Assembly
+	assRepo, err := repository.NewAssemblyApplicationRepository(db)
+	if err != nil {
+		log.Fatalf("[fatal] Error creating order repository: %v", err)
+	}
+	log.Printf("[info] Assembly appliation repository created")
+
+	assemblyApplicationTopic := viper.GetString("kafka.topics.assemblyApplication")
+	assemblyApplicationService := service.NewAssemblyApplicationService(assRepo, producer, assemblyApplicationTopic)
+	assemblyHandler := handler.NewAssemblyApplicationHandler(assemblyApplicationService)
+	http.HandleFunc("/api/assembly", assemblyHandler.CreateApplication)
+	http.HandleFunc("/api/assembly/complete", assemblyHandler.CompleteApplication)
+	http.HandleFunc("/api/assembly/cancel", assemblyHandler.CompleteApplication)
 
 	port := viper.GetString("server.address")
 	log.Printf("[info] Starting server on port %s", port)

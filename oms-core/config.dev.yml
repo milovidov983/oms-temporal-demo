@@ -3,7 +3,9 @@ database:
 
 kafka:
   brokers: localhost:9092
-  topic: oms.oms-core.orders.v1
+  topics:
+    order: oms.oms-core.orders.v1
+    assemblyApplication: oms.oms-core.assembly-application.v1
 
 server:
   address: 8888

@@ -8,6 +8,7 @@ const (
 	OrderStatusNew              OrderStatus = "NEW"
 	OrderStatusCreated          OrderStatus = "CREATED"
 	OrderStatusPassedToAssembly OrderStatus = "PASSED_TO_ASSEMBLY"
+	OrderStatusAssembled        OrderStatus = "ASSEMBLED"
 	OrderStatusCanceled         OrderStatus = "CANCELED"
 )
 
