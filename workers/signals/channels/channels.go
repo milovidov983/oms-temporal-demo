@@ -1,5 +1,6 @@
 package channels
 
+const SignalNameStartOrderProcessingChannel = "START_ORDER_PROCESSING_CHANNEL"
 const SignalNameStartAssemblyChannel = "START_ASSEMBLY_CHANNEL"
 const SignalNameCompleteAssemblyChannel = "COMPLETE_ASSEMBLY_CHANNEL"
 const SignalNameChangeAssemblyCommentChannel = "CHANGE_ASSEMBLY_COMMENT_CHANNEL"

@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/IBM/sarama"
 	"github.com/milovidov983/oms-temporal-demo/oms-core/repository"
+	"github.com/milovidov983/oms-temporal-demo/shared/events"
 	"github.com/milovidov983/oms-temporal-demo/shared/models"
 )
 
@@ -90,13 +92,34 @@ func (s *AssemblyApplicationService) publishAssemblyApplicationCanceled(
 func (s *AssemblyApplicationService) publishAssemblyApplication(
 	application *models.AssemblyApplication,
 ) error {
-	log.Printf("[debug] publishing assembly application event for ID %s and status: ", application.ID, application.Status)
+	log.Printf("[debug] publishing assembly application event for ID %s and status: %v and order %s", application.ID, application.Status, application.OrderID)
 	return nil
 }
 
 func (s *AssemblyApplicationService) publishAssemblyApplicationCompleted(
 	application *models.AssemblyApplication,
 ) error {
-	log.Printf("[debug] publishing assembly application event for ID %s and status: ", application.ID, application.Status)
-	return nil
+	log.Printf("[debug] publishing assembly application event for ID %s and status: %v and order %s", application.ID, application.Status, application.OrderID)
+
+	event := &events.AssemblyApplicationEvent{
+		EventType: events.AssemblyCompleted,
+		EventData: events.AssemblyEventData{
+			ID:      application.ID,
+			OrderID: application.OrderID,
+		},
+	}
+
+	msg, err := json.Marshal(event)
+	if err != nil {
+		return fmt.Errorf("failed to marshal assembly event: %w", err)
+	}
+
+	partition, offset, err := s.kafka.SendMessage(&sarama.ProducerMessage{
+		Topic: s.topic,
+		Value: sarama.StringEncoder(msg),
+	})
+
+	log.Printf("[debug] event published to kafka topic %s, partition %d, offset %d", s.topic, partition, offset)
+
+	return err
 }

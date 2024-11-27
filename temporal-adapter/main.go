@@ -15,21 +15,24 @@ func main() {
 
 	loadConfig()
 
-	handlerConfig := handler.OrderHandlerConfig{
+	handlerConfig := handler.HandlerConfig{
 		TemporalHost: viper.GetString("temporal.hostPort"),
 		Namespace:    viper.GetString("temporal.namespace"),
 	}
 	handlerConfig.Check()
 
-	orderHandler, err := handler.NewOrderHandler(handlerConfig)
+	handler, err := handler.NewHandler(handlerConfig)
 	if err != nil {
 		log.Fatalf("[fatal] Error creating order handler: %v", err)
 	}
 	cosumerConfig := consumer.ConsumerConfig{
 		Brokers: []string{viper.GetString("kafka.brokers")},
 		GroupID: viper.GetString("kafka.consumerGroup"),
-		Topic:   viper.GetString("kafka.topics.orders"),
-		Handler: orderHandler,
+		Topics: consumer.Topics{
+			Orders:               viper.GetString("kafka.topics.orders"),
+			AssemblyApplications: viper.GetString("kafka.topics.assembly"),
+		},
+		Handler: handler,
 	}
 	cosumerConfig.Check()
 

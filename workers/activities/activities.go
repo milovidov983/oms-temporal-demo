@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/milovidov983/oms-temporal-demo/shared/models"
 )
 
 type ActivitiesConfig struct {
@@ -31,12 +33,12 @@ func NewActivities(cfg *ActivitiesConfig) *Activities {
 	}
 }
 
-type AssemblyApplicationInput struct {
+type Input struct {
 	OrderID string
 }
 
-func (a *Activities) CreateAssemblyApplication(ctx context.Context, input *AssemblyApplicationInput) (string, error) {
-	url := a.OmsCoreHost + "/assembly"
+func (a *Activities) CreateAssemblyApplication(ctx context.Context, input *Input) (string, error) {
+	url := "http://" + a.OmsCoreHost + "/api/assembly"
 
 	request := struct {
 		OrderID string `json:"order_id"`
@@ -77,4 +79,21 @@ func (a *Activities) CreateAssemblyApplication(ctx context.Context, input *Assem
 	}
 
 	return applicationID, nil
+}
+
+func (a *Activities) GetOrderTypes(ctx context.Context, input *Input) ([]models.OrderType, error) {
+
+	// Тут мы ходим в oms-core за свойствами заказа, условно, надо его доставлять собирать и так далее.
+	// Ожнако в целевой продовой версии можно передавать все эти свойства в workflow в качестве
+	// входящих параметров, а не делать запросы к oms-core.
+	// Если один из признаков удаляется, например клиент решил приехать сам за заказом. То это свойство
+	// можно поменять послав соответсвующий сигнал в wkrkflow
+
+	// mock: для целей демонстраии, все заказы со сборкой и доставкой
+	orderTypes := []models.OrderType{
+		models.OrderTypeDelivery,
+		models.OrderTypeAssembly,
+	}
+
+	return orderTypes, nil
 }

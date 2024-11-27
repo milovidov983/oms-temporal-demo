@@ -7,3 +7,4 @@ kafka:
   consumerGroup: oms-temporal-adapter
   topics:
     orders: oms.oms-core.orders.v1
+    assembly: oms.assembly.application.v1

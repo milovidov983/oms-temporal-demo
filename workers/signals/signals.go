@@ -2,6 +2,10 @@ package signals
 
 import "github.com/milovidov983/oms-temporal-demo/shared/models"
 
+type SignalPayloadStartProcessing struct {
+	Route string
+}
+
 type SignalPayloadCompleteAssembly struct {
 	Route     string
 	Collected []models.OrderItem

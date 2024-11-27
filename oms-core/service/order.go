@@ -56,8 +56,47 @@ func (s *OrderService) GetOrderStatus(ctx context.Context, orderID string) (mode
 	return order.Status, nil
 }
 
+func (s *OrderService) CancelOrder(ctx context.Context, orderID string) error {
+	order, err := s.repo.GetOrder(ctx, orderID)
+	if err != nil {
+		return fmt.Errorf("failed to get order: %w", err)
+	}
+
+	order.Status = models.OrderStatusCanceled
+
+	if err := s.repo.SaveOrder(ctx, order); err != nil {
+		return fmt.Errorf("failed to save order: %w", err)
+	}
+
+	if err := s.publishOrderCancelled(order); err != nil {
+		return fmt.Errorf("failed to publish order canceled event: %w", err)
+	}
+
+	return nil
+}
+
 func (s *OrderService) validateOrder(order *models.Order) error {
 	return nil
+}
+
+func (s *OrderService) publishOrderCancelled(order *models.Order) error {
+	event := &events.OrderEvent{
+		EventType: events.OrderCancelled,
+		EventData: *order,
+	}
+	msg, err := json.Marshal(event)
+	if err != nil {
+		return fmt.Errorf("failed to marshal order cancelled event: %w", err)
+	}
+
+	partition, offset, err := s.kafka.SendMessage(&sarama.ProducerMessage{
+		Topic: s.topic,
+		Value: sarama.StringEncoder(msg),
+	})
+
+	log.Printf("[debug] event published to kafka topic %s, partition %d, offset %d", s.topic, partition, offset)
+
+	return err
 }
 
 func (s *OrderService) publishOrderCreated(order *models.Order) error {
@@ -67,7 +106,7 @@ func (s *OrderService) publishOrderCreated(order *models.Order) error {
 	}
 	msg, err := json.Marshal(event)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marshal order created event: %w", err)
 	}
 
 	partition, offset, err := s.kafka.SendMessage(&sarama.ProducerMessage{

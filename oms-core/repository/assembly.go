@@ -184,9 +184,9 @@ func (r *assRepository) createAssemblyApplication(ctx context.Context, tx *sql.T
 func (r *assRepository) updateOrder(ctx context.Context, tx *sql.Tx, orderID, assemblyApplicationID string) error {
 	result, err := tx.ExecContext(ctx, `
         UPDATE orders
-        SET assembly_application_id = $1
+        SET assembly_application_id = $1, status = $2
         WHERE id = $3
-    `, assemblyApplicationID, orderID)
+    `, assemblyApplicationID, models.OrderStatusPassedToAssembly, orderID)
 
 	if err != nil {
 		return fmt.Errorf("%w: failed to update order: %v", ErrDatabaseOperation, err)

@@ -46,6 +46,7 @@ func main() {
 	orderHandler := handler.NewOrderHandler(orderService)
 	http.HandleFunc("/api/orders", orderHandler.CreateOrder)
 	http.HandleFunc("/api/orders/status", orderHandler.GetStatus)
+	http.HandleFunc("/api/orders/cancel", orderHandler.CancelOrder)
 
 	// Assembly
 	assRepo, err := repository.NewAssemblyApplicationRepository(db)

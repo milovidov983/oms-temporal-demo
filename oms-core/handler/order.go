@@ -67,3 +67,27 @@ func (h *OrderHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": string(status)})
 	log.Printf("[info] Order status retrieved: %s", status)
 }
+
+func (h *OrderHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		log.Printf("[warn] Method not allowed: %s", r.Method)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	orderID := r.URL.Query().Get("order_id")
+	if orderID == "" {
+		log.Printf("[warn] Order ID not provided")
+		http.Error(w, "Order ID not provided", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.service.CancelOrder(r.Context(), orderID); err != nil {
+		log.Printf("[error] Failed to cancel order: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	log.Printf("[info] Order canceled: %s", orderID)
+}

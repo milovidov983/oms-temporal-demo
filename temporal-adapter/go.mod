@@ -3,7 +3,14 @@ module github.com/milovidov983/oms-temporal-demo/temporal-adapter
 go 1.22.2
 
 require (
-	github.com/IBM/sarama v1.43.3 // indirect
+	github.com/IBM/sarama v1.43.3
+	github.com/milovidov983/oms-temporal-demo/shared v0.0.0-20241122113211-e082f48f35f2
+	github.com/milovidov983/oms-temporal-demo/workers v0.0.0-20241122113211-e082f48f35f2
+	github.com/spf13/viper v1.19.0
+	go.temporal.io/sdk v1.30.0
+)
+
+require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eapache/go-resiliency v1.7.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
@@ -41,12 +48,10 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.19.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.temporal.io/api v1.40.0 // indirect
-	go.temporal.io/sdk v1.30.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
